@@ -1,6 +1,7 @@
 package com.mxprep.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.opencsv.bean.CsvBindByName;
+import com.opencsv.bean.CsvDate;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,11 +10,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.Data;
-
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import lombok.Data;
 
 @Data
 @Entity
@@ -25,21 +24,28 @@ public class Price {
     @Column(name = "id_price")
     private long id;
 
-    @JsonFormat(pattern = "MM-dd-yyyy")
+    @CsvBindByName
+    @CsvDate(value = "MM/dd/yyyy")
+//    @JsonFormat(pattern = "MM-dd-yyyy")
     private LocalDate date;
 
+    @CsvBindByName
     private BigDecimal open;
 
+    @CsvBindByName
     private BigDecimal high;
 
+    @CsvBindByName
     private BigDecimal low;
 
+    @CsvBindByName
     private BigDecimal close;
 
-    private Integer volume;
+    @CsvBindByName
+    private String volume;
 
     @ManyToOne
-    @JoinColumn(name="id_company", nullable=false)
+    @JoinColumn(name = "id_company", nullable = false)
     private Company company;
 
 }
