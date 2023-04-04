@@ -2,6 +2,8 @@ package com.mxprep.service.impl;
 
 import com.mxprep.model.Company;
 import com.mxprep.model.Price;
+import com.mxprep.model.PriceNormalizedStatistics;
+import com.mxprep.model.PriceStatistics;
 import com.mxprep.opencsv.PriceVerifier;
 import com.mxprep.repository.CompanyRepository;
 import com.mxprep.repository.PriceRepository;
@@ -12,6 +14,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -37,6 +40,21 @@ public class PriceServiceImpl implements PriceService {
                     .build();
             priceRepository.saveAll(csvToBean.parse());
         }
+    }
+
+    @Override
+    public List<PriceStatistics> getStatisticsByCompany() {
+        return priceRepository.getPricesStatisticsByCompany();
+    }
+
+    @Override
+    public List<PriceNormalizedStatistics> getPricesNormalizedDesc() {
+        return priceRepository.getPricesNormalizedDesc();
+    }
+
+    @Override
+    public List<PriceStatistics> getPricesStatisticsByCompanyName(String companyName) {
+        return priceRepository.getPricesStatisticsByCompanyName(companyName);
     }
 
     private Company findCompanyByName(String fileName) {
