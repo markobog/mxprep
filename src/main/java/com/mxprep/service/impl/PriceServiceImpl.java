@@ -7,19 +7,22 @@ import com.mxprep.model.PriceStatistics;
 import com.mxprep.opencsv.PriceVerifier;
 import com.mxprep.repository.CompanyRepository;
 import com.mxprep.repository.PriceRepository;
-import com.mxprep.service.PriceService;
+import com.mxprep.service.IPriceService;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
+import jakarta.annotation.Nonnull;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
-public class PriceServiceImpl implements PriceService {
+public class PriceServiceImpl implements IPriceService {
 
     private final PriceRepository priceRepository;
     private final CompanyRepository companyRepository;
@@ -30,7 +33,7 @@ public class PriceServiceImpl implements PriceService {
     }
 
     @Override
-    public void save(MultipartFile file) throws IOException {
+    public List<Price> save(@Nonnull MultipartFile file) throws IOException {
         try (Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
             Company company = findCompanyByName(file.getOriginalFilename());
             CsvToBeanBuilder<Price> priceCsvToBeanBuilder = new CsvToBeanBuilder<>(reader);
@@ -38,7 +41,7 @@ public class PriceServiceImpl implements PriceService {
             priceCsvToBeanBuilder.withVerifier(new PriceVerifier(company));
             CsvToBean<Price> csvToBean = priceCsvToBeanBuilder
                     .build();
-            priceRepository.saveAll(csvToBean.parse());
+            return priceRepository.saveAll(csvToBean.parse());
         }
     }
 
@@ -57,10 +60,15 @@ public class PriceServiceImpl implements PriceService {
         return priceRepository.getPricesStatisticsByCompanyName(companyName);
     }
 
-    private Company findCompanyByName(String fileName) {
+    @Override
+    public List<PriceNormalizedStatistics> getPriceNormalizedMaxByDate(LocalDate date) {
+        return priceRepository.getPriceNormalizedMaxForDate(date);
+    }
 
+    private Company findCompanyByName(@Nonnull String fileName) {
+
+        Objects.requireNonNull(fileName);
         String fullName = null;
-        Company company;
         if (fileName.contains("AAPL")) {
             fullName = "Apple";
         } else if (fileName.contains("MSFT")) {
@@ -70,7 +78,6 @@ public class PriceServiceImpl implements PriceService {
         } else if (fileName.contains("EPAM")) {
             fullName = "EPAM";
         }
-        company = companyRepository.findByCompanyName(fullName);
-        return company;
+        return companyRepository.findByCompanyName(fullName);
     }
 }
