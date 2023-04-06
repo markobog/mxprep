@@ -12,6 +12,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Optional;
 import lombok.Data;
 
 @Data
@@ -45,6 +46,6 @@ public class Price {
 
     @ManyToOne
     @JoinColumn(name = "id_company", nullable = false)
-    private Company company;
+    private Optional<Company> company;
 
 }
